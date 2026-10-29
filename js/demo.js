@@ -63,11 +63,10 @@ const line = d3.line().curve(d3.curveCatmullRomClosed.alpha(0.5))
 onRaceChange(race => {
     const points = race.outline;
     console.log('Outline points:', points.length, points.slice(0, 3));
-    
 
     // TODO STEP 1: How big is the track? Use d3.extent to get [min, max] of x and of y
-    const xRange = d3.extent(points, d => d[0]); //[0, 20000]
-    const yRange = d3.extent(points, d=> d[1]);
+    const xRange = d3.extent(points, d => d[0]);
+    const yRange = d3.extent(points, d => d[1]);
 
     const trackWidth = xRange[1] - xRange[0];
     const trackHeight = yRange[1] - yRange[0];
@@ -77,39 +76,49 @@ onRaceChange(race => {
     // k is the min value between two values:
     // screen width - left and right padding over the track width
     // screen height - top and bottom padding over the track height
-    const k = Math.min((width - padding*2)/trackWidth, (height-padding*2)/trackHeight);
+    const k = Math.min(
+        (width - 2 * padding) / trackWidth,
+        (height - 2 * padding) / trackHeight
+    );
 
-    // TODO STEP 3: Center the track 
+    // TODO STEP 3: Center the track
     // Right now the track would start from the top left corner of the canvas
     // We need to create an offset to start from the center
-    const offsetX = (width - k*trackWidth)/2;
-    const offsetY = (height - k*trackHeight)/2;
-    
-    
+    const offsetX = (width - trackWidth * k) / 2;
+    const offsetY = (height - trackHeight * k) / 2;
+
     // TODO STEP 4: Build scales x and y, using scale factor x
     const x = d3.scaleLinear()
         .domain(xRange)
-        .range([offsetX, offsetX + k*trackWidth]);
+        .range([offsetX, offsetX + trackWidth * k]);
 
     const y = d3.scaleLinear()
         .domain(yRange)
-        .range([height-offsetY, height - offsetY - k*trackHeight]); // Remember: SVG y points DOWN, so flip the range of y (otherwise the circuit is mirrored)
-    
+        .range([offsetY + trackHeight * k, offsetY]); // Remember: SVG y points DOWN, so flip the range of y (otherwise the circuit is mirrored)
+
     // TODO STEP 5: convert the points to screen positions and set the path's "d" attribute
     const screenPoints = points.map(d => [x(d[0]), y(d[1])]);
 
     // TODO STEP 6: Use a transition so the old circuit morphs into the new one when the race changes:
     // track.transition().duration(duration).attr('d', ...)
     // ...and at the end of this function: duration = 750;
-    track.transition().duration(duration).attr('d', line(screenPoints));
-
+    track.transition()
+        .duration(duration)
+        .attr('d', line(screenPoints));
 
     // TODO STEP 7: move the start/finish dot and label to the first point of the lap
     const [startX, startY] = screenPoints[0];
+
+    startDot
+        .attr('cx', startX)
+        .attr('cy', startY);
+
+    startLabel
+        .attr('x', startX + 12)
+        .attr('y', startY - 12);
+
     // startDot is a circle, so it means we need to define cx, cy
-    startDot.transition().duration(duration).attr('cx', startX).attr('cy', startY);
     // startLabel is a text, we need to define x and y
-    startDot.transition().duration(duration).attr('x', startX + 12).attr('y', startY - 10);
 
     // Update the aria-label of the svg with the race name
     svg.attr('aria-label', `Track outline of the ${race.label}`);
@@ -138,20 +147,20 @@ replayButton.on('click', () => {
         .attr('cy', start.y)
         .attr('transform', null);
 
-    
+
     // Disable the button while the lap plays, so clicks do not restart it
     replayButton.property('disabled', true);
 
     // TODO STEP 9: Set animation duration to 5 seconds and specify how to translate points
     replayDot.transition()
         .duration(5000)
-        .ease(d3.easeLinear) // constant speed
+        .ease(d3.easeLinear)
         .attrTween('transform', () => t => {
             const p = path.getPointAtLength(t * length);
             return `translate(${p.x - start.x}, ${p.y - start.y})`;
         })
-        // 'end' when the lap finishes, 'interrupt' when a race change stops it
-        .on('end interrupt', () => replayButton.property('disabled', false));
+        .on('end interrupt', () =>
+            replayButton.property('disabled', false)
+        );
 
 });
-
