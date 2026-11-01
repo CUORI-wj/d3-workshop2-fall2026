@@ -70,15 +70,15 @@ git push
 
 **Participation answer** (3 sentences): which driver's strategy differed most from the winner's, and what on the chart shows it?
 
->
+>  In the Japanese Grand Prix, Hamilton had a different strategy from the winner, starting on hard tyres and switching to mediums instead of the other way around. In the British Grand Prix, Stroll stood out because he switched between intermediate and soft tyres while Norris mainly stayed on intermediates before changing to mediums. In the Dutch Grand Prix, Sainz differed the most from Piastri by making several tyre changes and using soft tyres toward the end of the race.
 
 **Assignment** (2 or 3 sentences): pick one race. What does the race trace show that a plain chart of lap times would hide?
 
->
+>  I chose the 2025 Dutch Grand Prix. The gaps between Piastri and the other drivers grew over several laps, but suddenly became much smaller around laps 23, 55, and 67. This makes it easier to see how the gaps changed throughout the race, rather than just comparing individual lap times.
 
 **Bonus** (optional): which race did you add, and why?
 
->
+>  I added the 2024 Monaco Grand Prix because I wanted to see how the race trace would look on a circuit where overtaking is difficult.
 
 ---
 
